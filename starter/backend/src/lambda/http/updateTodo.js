@@ -3,10 +3,10 @@ import cors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
 
 import { getUserId } from '../utils.mjs'
-import { todoAccess, updateTodo } from '../../businessLogic/todos.mjs'
+import { updateTodo } from '../../businessLogic/todos.mjs'
 import { createLogger } from '../../utils/logger.mjs'
 
-const logger = createLogger('updateTodo')
+const logger = createLogger('lamdaUpdateTodo')
 
 export const handler = middy()
   .use(httpErrorHandler())
@@ -16,20 +16,8 @@ export const handler = middy()
     const updatedTodo = JSON.parse(event.body)
     const userId = getUserId(event)
 
-    logger.info('Validate userId todo access')
-    const validAccess = await todoAccess(userId)
-
-    if (!validAccess) {
-      throw createError(
-        403,
-        JSON.stringify({
-          error: 'User is forbidden'
-        })
-      )
-    }
-
-    logger.info('update todo item with todo id and event body')
-    await updateTodo(todoId, updatedTodo)
+    logger.info('LAMBDA: Update todo item with todo id and event body')
+    await updateTodo(userId, todoId, updatedTodo)
 
     return {
       statusCode: 204
